@@ -4,12 +4,9 @@
 > **Handoff:** M1 → M2 handoff  
 > **Scope:** Local lab gateway on 127.0.0.1:32761. APK was hashed and signature-checked, not installed or manually executed.
 
-**Source note:** This Markdown write-up is derived from the completed Word report for the corresponding controlled Asterion Range 3 lab. The evidence images are the terminal screenshots embedded in that report. Interpret findings within the simulated lab context.
+**Source note:** This Markdown write-up is derived from the completed Word report for the controlled Asterion Range 3 lab. The screenshots are placed inline immediately after the command/output steps they document. Their image assets are stored in `../evidence/M1/` so GitHub can render the repository-relative links. Interpret findings within the simulated lab context.
 
 ---
-
-
-> **Screenshot evidence:** Images below are embedded from the repository-relative files under `../evidence/M1/`. When publishing, commit this Markdown file together with the entire `evidence/M1/` directory; the links will not render if the image files are missing from GitHub.
 
 ## 1. Executive summary
 
@@ -53,14 +50,22 @@ This report records the simulated IR-Range3-M1 workflow on the local lab VM. The
 
 ### 4.1 VM preflight, package verification and setup
 
-The initial preflight recorded the VM hostname, checked that the previous M5 service was inactive, inspected the former Python capability, and confirmed network interfaces before setup. The host-only interface was 192.168.56.103/24. The extracted package contained setup/validation scripts, scenario configuration, evidence references, the supplied Nuclei TTP template, an APK, its detached signature and a signing certificate. The shell syntax check passed before setup was run.
+The initial preflight recorded the VM hostname, checked that the previous M5 service was inactive, inspected the former Python capability, and confirmed network interfaces before setup. The host-only interface was `192.168.56.103/24`.
 
 ```bash
 hostname
 systemctl is-active aethon-core-monitor 2>/dev/null || true
 getcap /usr/bin/python3.14 2>/dev/null || true
 ip -br addr
+```
 
+![E01 — Package extraction and initial VM/network preflight](../evidence/M1/E01.jpg)
+
+*Figure E01. Initial VM identity and network preflight.*
+
+The package was then checked and installed. One manifest mismatch warning was observed and is retained as an integrity exception rather than silently overwritten.
+
+```bash
 cd ~/Downloads/IR-Range3-M1-Trojan-Research-Utility
 chmod +x setup.sh validate-setup.sh validate-attack.sh validate-completion.sh reset.sh
 bash -n setup.sh && echo "Task 1 setup syntax passed"
@@ -69,7 +74,11 @@ sudo ./setup.sh
 sudo ./validate-setup.sh
 ```
 
-Observed result: hostname returned ir-range3-m1; the former aethon-core-monitor service was inactive; and the host-only interface was 192.168.56.103/24. The setup script reported “Setup Successfully”, the clean setup validator reported [PASS], and the gateway was listed on TCP 32761. The package manifest check emitted a warning that one computed checksum did not match. The affected entry was not conclusively identified in the screenshot record, so the report does not claim the entire package manifest passed. Evidence: E01–E02.
+![E02 — Manifest check and clean setup validation](../evidence/M1/E02.jpg)
+
+*Figure E02. Setup and clean-state validation passed; one package-manifest checksum warning was reported.*
+
+Observed result: the previous `aethon-core-monitor` service was inactive, the host-only interface was `192.168.56.103/24`, setup reported “Setup Successfully”, the clean setup validator returned `[PASS]`, and the gateway was listed on TCP `32761`. The initial package manifest check emitted a warning that one computed checksum did not match; the screenshot record does not conclusively identify the affected entry.
 
 ### 4.2 Verify local service and attack assets
 
@@ -81,11 +90,26 @@ bash ./verify-attack-assets.sh
 command -v nuclei || echo "Nuclei is not installed"
 ```
 
-Before triggering the scenario, the health endpoint returned HTTP 200 with state ready. The status endpoint returned HTTP 200 with incident_active false and inbound_handoff_verified true. The bundled attack-asset check reported [PASS] Attack assets verified. Nuclei was initially absent. Evidence: E03–E04.
+![E03 — Gateway health, status, and attack-asset verification](../evidence/M1/E03.jpg)
+
+*Figure E03. Local health/status checks returned HTTP 200, attack assets passed, and Nuclei was not yet installed.*
+
+The validator, scenario configuration, evidence inventory, and technical story were then reviewed read-only before the controlled trigger.
+
+```bash
+sed -n '1,220p' validate-attack.sh
+cat challenge/config/scenario.json
+find challenge/evidence -maxdepth 3 -type f -print | sort
+sed -n '1,180p' Range-Technical-Story.md
+```
+
+![E04 — Read-only review of validator, configuration, evidence inventory, and scenario notes](../evidence/M1/E04.jpg)
+
+*Figure E04. Read-only review of scenario prerequisites and evidence paths.*
 
 ### 4.3 Preserve and verify the release APK
 
-The investigation case folder was created at $HOME/AST-IR-2026-0017. The Range 2 handoff, DNS manifest, clean status, APK, detached signature and AST-MOBILE-17 certificate were copied before triggering the scenario. The APK hash was compared with the expected value supplied by the package.
+The investigation case folder was created at `$HOME/AST-IR-2026-0017`. The incoming handoff, DNS manifest, clean status, APK, detached signature, and AST-MOBILE-17 certificate were copied before triggering the scenario. The APK digest was compared with the expected package value.
 
 ```bash
 CASE="$HOME/AST-IR-2026-0017"
@@ -101,11 +125,35 @@ openssl dgst -sha256 -verify "$CASE/package/mobile-public.pem" \
   "$CASE/package/AsterionLabAssist-3.6.17.apk"
 ```
 
-Observed result: expected and actual SHA-256 were identical, and OpenSSL printed Verified OK. This establishes that the signature matches the certificate public key; it does not establish that the APK is benign. The APK was not installed or run. Evidence: E05.
+![E05 — APK SHA-256 match and detached-signature verification](../evidence/M1/E05.jpg)
+
+*Figure E05. Expected and observed APK SHA-256 values matched and OpenSSL returned `Verified OK`. The APK was not installed or executed.*
 
 ### 4.4 Validate and run the supplied Nuclei template
 
-The scenario validator expected the incident record to show incident_active true and source nuclei. Because Nuclei was not installed, version 3.11.1 was downloaded from the official ProjectDiscovery GitHub release, the archive checksum was checked, and the binary was installed into $HOME/.local/bin.
+The supplied validator expected the incident record to show `incident_active: true` and `source: nuclei`. The templates, validator, and documented local endpoint were inspected before running Nuclei.
+
+```bash
+sed -n '1,240p' Attack-VM/IR-Range3-M1/IR-Range3-M1-Attack-Template.yaml
+sed -n '1,240p' Attack-VM/IR-Range3-M1/IR-Range3-M1-ServiceAvailabilityTTP.yaml
+```
+
+![E06 — TTP templates and validator preconditions reviewed](../evidence/M1/E06.jpg)
+
+*Figure E06. The two supplied templates and the required incident-source condition were reviewed.*
+
+```bash
+grep -nE '127\.0\.0\.1|32761|/api/v1/mdm/release|handoff|release' \
+  Attack-VM/IR-Range3-M1/IR-Range3-M1-Attack-Template.yaml \
+  Attack-VM/IR-Range3-M1/IR-Range3-M1-ServiceAvailabilityTTP.yaml \
+  README.md Range-Technical-Story.md
+```
+
+![E07 — Local release endpoint and next-stage handoff references](../evidence/M1/E07.jpg)
+
+*Figure E07. The local release endpoint and expected M2 handoff were identified from the supplied artifacts.*
+
+Because Nuclei was not installed, version `3.11.1` was downloaded from the official ProjectDiscovery GitHub release, the archive checksum was checked, and the binary was installed into `$HOME/.local/bin`.
 
 ```bash
 mkdir -p "$HOME/Downloads/nuclei-install" "$HOME/.local/bin"
@@ -120,7 +168,7 @@ cd ~/Downloads/IR-Range3-M1-Trojan-Research-Utility
 nuclei -validate -t ./Attack-VM/IR-Range3-M1/IR-Range3-M1-Attack-Template.yaml
 ```
 
-**Controlled local trigger and validation**
+The controlled trigger targeted only the local lab gateway.
 
 ```bash
 CASE="$HOME/AST-IR-2026-0017"
@@ -130,11 +178,13 @@ nuclei -duc -u 127.0.0.1 -t "$TEMPLATE" -retries 0 -timeout 5 \
 sudo ./validate-attack.sh
 ```
 
-Observed result: the template and validator logic showed that the expected incident source was nuclei. Nuclei reported all templates validated successfully, loaded one target, found one match on 127.0.0.1:32761, and the validator returned [PASS] Live attack and telemetry validated. The command was limited to localhost; the APK was not manually executed. Evidence: E06–E08.
+![E08 — Nuclei template validation, one local match, and live telemetry validation](../evidence/M1/E08.jpg)
+
+*Figure E08. Nuclei found one match on `127.0.0.1:32761`, and `validate-attack.sh` reported `[PASS] Live attack and telemetry validated`.*
 
 ### 4.5 Collect telemetry and create an evidence manifest
 
-The first collection attempt queried several guessed filenames that were not present. A source inventory then identified the actual available artifacts, including file-events.jsonl, gateway-access.log, token-access.jsonl, process-events.jsonl and network-events.jsonl under /var/log/asterion. The case workspace retained incident status, Nuclei output, gateway journal and acquisition notes. A SHA-256 manifest was generated for the copied case files and the listed entries returned OK. The attempt to copy the device-local APK/secondary DEX used AST-LAB-RSCH-017, while the inventory and handoff use AST-LNX-RSCH-017; the copy was therefore not confirmed. Evidence: E09–E11.
+The first collection attempt queried some filenames that were not present. A source inventory then identified the available artifacts, including `file-events.jsonl`, `gateway-access.log`, `token-access.jsonl`, `process-events.jsonl`, and `network-events.jsonl` under `/var/log/asterion`.
 
 ```bash
 CASE="$HOME/AST-IR-2026-0017"
@@ -143,32 +193,68 @@ find "$CASE" -type f ! -path "$CASE/notes/SHA256SUMS.txt" \
 sha256sum -c "$CASE/notes/SHA256SUMS.txt"
 ```
 
+![E09 — Evidence inventory and case-folder hash verification](../evidence/M1/E09.jpg)
+
+*Figure E09. A SHA-256 manifest was generated and the listed case files were checked.*
+
 ### 4.6 Review the incident record and timeline
 
-The status record showed machine IR-Range3-M1 and state incident_active, with source nuclei. The process telemetry described labassist-agent running /opt/asterion/app/device_agent.py. The network telemetry included logical destination update-checker.net:443 and training transport 127.0.0.1:32761. These are simulated lab records; the logical destination field is not, by itself, proof that a real public endpoint was contacted. Evidence: E10.
+The status record showed machine `IR-Range3-M1` and state `incident_active`, with source `nuclei`. Process telemetry described `labassist-agent` running `/opt/asterion/app/device_agent.py`. Network telemetry included a logical destination of `update-checker.net:443` and training transport `127.0.0.1:32761`. The logical destination is a simulated lab record, not proof that a real public endpoint was contacted.
 
-| Evidence source | Use in the timeline |
-| --- | --- |
-| incident.json | Confirms incident state, source and device identifier. |
-| gateway-access.log / gateway-journal.txt | Correlates the local release request and gateway service activity. |
-| process-events.jsonl | Records the labassist-agent process start and executable/script fields. |
-| network-events.jsonl | Records the logical destination and local training transport fields. |
-| file-events.jsonl / token-access.jsonl | Provides additional file and token-access telemetry for follow-up analysis. |
-| nuclei-trigger.txt | Records the local Nuclei scan result and supports the trigger sequence. |
+```bash
+cat "$CASE/baseline/incident.json"
+for f in file-events.jsonl gateway-access.log token-access.jsonl process-events.jsonl network-events.jsonl; do
+  if [ -f "/var/log/asterion/$f" ]; then
+    echo "===== $f ====="
+    tail -n 30 "/var/log/asterion/$f"
+  fi
+done
+```
+
+![E10 — Incident status and process/network telemetry review](../evidence/M1/E10.jpg)
+
+*Figure E10. Incident state and process/network telemetry were reviewed; one attempted device-artifact copy used a non-matching device path.*
 
 ### 4.7 Generate and validate the M2 handoff
 
-The first completion-validator run reported M2 handoff missing. The supplied builder was then used with case ID AST-IR-2026-0017 and analyst account vboxuser. It created /var/lib/asterion/handoff/IR-Range3-M1-to-M2.json. The generated JSON was displayed, then the completion validator was run again.
+The first completion check reported that the M2 handoff was missing. The evidence manifest and the validator's requirements were reviewed before building the handoff.
 
 ```bash
-cd ~/Downloads/IR-Range3-M1-Trojan-Research-Utility
-sudo /opt/asterion/tools/build-m2-handoff.py \
-  --case-id AST-IR-2026-0017 --analyst "$USER"
-sudo cat /var/lib/asterion/handoff/IR-Range3-M1-to-M2.json
+sha256sum -c "$CASE/notes/SHA256SUMS.txt"
 sudo ./validate-completion.sh
 ```
 
-Final observed result: [PASS] Scenario 2 handoff validated. The handoff recorded handoff ID R3-M1-AST-017, source IR-Range3-M1, destination IR-Range3-M2, case ID AST-IR-2026-0017, researcher dr.mira.rao@asterion.example, workstation AST-LNX-RSCH-017, campaign marker MDRN-7F3A, and the PostgreSQL token-collection command used as the next-stage scope indicator. Evidence: E11–E14.
+![E11 — Evidence manifest passed; initial completion check reported missing handoff](../evidence/M1/E11.jpg)
+
+*Figure E11. Saved artifacts verified, while the first completion check correctly reported that the M2 handoff had not yet been generated.*
+
+```bash
+sed -n '1,220p' validate-completion.sh
+sed -n '1,180p' challenge/evidence/README.md
+grep -n -A 5 -B 3 -E 'handoff|build-m2-handoff|Scenario 2' README.md INTERNAL-IMPLEMENTATION.md Range-Technical-Story.md
+```
+
+![E12 — Handoff requirements and supplied builder contract reviewed](../evidence/M1/E12.jpg)
+
+*Figure E12. The completion requirements and M1-to-M2 handoff contract were inspected read-only.*
+
+```bash
+sudo /opt/asterion/tools/build-m2-handoff.py \
+  --case-id AST-IR-2026-0017 --analyst "$USER"
+sudo cat /var/lib/asterion/handoff/IR-Range3-M1-to-M2.json
+```
+
+![E13 — M1-to-M2 handoff generated and inspected](../evidence/M1/E13.jpg)
+
+*Figure E13. The generated JSON records handoff ID `R3-M1-AST-017`, source and destination machine IDs, case ID, researcher, workstation, campaign marker, and the next-stage scope indicator.*
+
+```bash
+sudo ./validate-completion.sh
+```
+
+![E14 — Final completion validator passed](../evidence/M1/E14.jpg)
+
+*Figure E14. Final output: `[PASS] Scenario 2 handoff validated`.*
 
 ## 5. Important handoff fields
 
@@ -221,75 +307,3 @@ This exercise reinforced that a signed package is not automatically a safe packa
 | Device-local secondary DEX / installed APK copied into case folder | Follow-up recommended due path mismatch in first copy attempt |
 
 Conclusion: Task 1 reached the challenge-defined completion state: the final M1-to-M2 handoff was generated and accepted. This is completion of the setup/trigger/telemetry/handoff workflow, not a claim that the entire Blue Team Write-up has been executed. The captured session did not document full static analysis of the APK, recovery and inspection of the secondary DEX, complete scope determination, or containment/eradication/recovery actions. Preserve the original M1 VM and address the evidence-quality notes before treating the evidence directory as a complete forensic acquisition.
-
-## Appendix A. Terminal screenshot evidence
-
-The following 14 screenshots are the supplied terminal captures from the M1 workflow. They are retained chronologically and captioned by the activity they support. The VM clock is shown in each screenshot; endpoint date headers used GMT during the session. Image scaling is for page fit only, and the command/output content is not redacted or rewritten.
-
-![Terminal evidence E01](../evidence/M1/E01.jpg)
-
-**E01 | 24 Oct 2026, VM clock 13:05 |** Package extraction, setup-script syntax check, and initial VM/network preflight.
-
-![Terminal evidence E02](../evidence/M1/E02.jpg)
-
-**E02 | 24 Oct 2026, VM clock 13:07 |** Manifest results and setup validation. One manifest checksum mismatch warning was reported; setup and clean-state validation passed.
-
-### Appendix A. Terminal screenshot evidence (continued)
-
-![Terminal evidence E03](../evidence/M1/E03.jpg)
-
-**E03 | 24 Oct 2026, VM clock 13:09 |** Local gateway health and status returned HTTP 200; attack assets passed verification; Nuclei was not yet installed.
-
-![Terminal evidence E04](../evidence/M1/E04.jpg)
-
-**E04 | 24 Oct 2026, VM clock 13:11 |** Read-only review of the attack validator, scenario configuration, evidence inventory, and technical story.
-
-### Appendix A. Terminal screenshot evidence (continued)
-
-![Terminal evidence E05](../evidence/M1/E05.jpg)
-
-**E05 | 24 Oct 2026, VM clock 13:14 |** Preserved APK SHA-256 matched the expected digest and OpenSSL detached-signature verification returned Verified OK.
-
-![Terminal evidence E06](../evidence/M1/E06.jpg)
-
-**E06 | 24 Oct 2026, VM clock 13:15 |** Review of the two TTP templates and validator logic; the active incident source was required to be nuclei.
-
-### Appendix A. Terminal screenshot evidence (continued)
-
-![Terminal evidence E07](../evidence/M1/E07.jpg)
-
-**E07 | 24 Oct 2026, VM clock 13:17 |** Template and documentation references identified the local release endpoint and the intended M2 handoff path.
-
-![Terminal evidence E08](../evidence/M1/E08.jpg)
-
-**E08 | 24 Oct 2026, VM clock 13:21 |** Nuclei v3.11.1 template validation succeeded; the local scan produced one match and live-telemetry validation passed.
-
-### Appendix A. Terminal screenshot evidence (continued)
-
-![Terminal evidence E09](../evidence/M1/E09.jpg)
-
-**E09 | 24 Oct 2026, VM clock 13:23 |** Evidence inventory and SHA-256 manifest checks for the collected case files.
-
-![Terminal evidence E10](../evidence/M1/E10.jpg)
-
-**E10 | 24 Oct 2026, VM clock 13:25 |** Incident status and process/network telemetry review. The attempted device-artifact copy used a path that did not resolve.
-
-### Appendix A. Terminal screenshot evidence (continued)
-
-![Terminal evidence E11](../evidence/M1/E11.jpg)
-
-**E11 | 24 Oct 2026, VM clock 13:26 |** Evidence-manifest entries verified; completion validation initially reported M2 handoff missing.
-
-![Terminal evidence E12](../evidence/M1/E12.jpg)
-
-**E12 | 24 Oct 2026, VM clock 13:27 |** Read-only review of completion requirements, M2 handoff builder, and documented handoff contract.
-
-### Appendix A. Terminal screenshot evidence (continued)
-
-![Terminal evidence E13](../evidence/M1/E13.jpg)
-
-**E13 | 24 Oct 2026, VM clock 13:29 |** Generated M1-to-M2 handoff JSON and inspected its machine IDs, case ID, researcher and workstation identifiers.
-
-![Terminal evidence E14](../evidence/M1/E14.jpg)
-
-**E14 | 24 Oct 2026, VM clock 13:30 |** Final completion validator returned [PASS] Scenario 2 handoff validated.

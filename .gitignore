@@ -1,0 +1,15 @@
+# Raw challenge/case artifacts and secrets — do not commit
+*.img
+*.dd
+*.raw
+*.hiber
+*.swap
+*.wal
+*.tar.gz
+*.ngpkg
+*.apk
+*.key
+*.pem
+*.env
+recovered-slack.json
+recovered-timing-channel.json

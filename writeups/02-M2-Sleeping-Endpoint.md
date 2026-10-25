@@ -8,6 +8,9 @@
 
 ---
 
+
+> **Screenshot evidence:** Images below are embedded from the repository-relative files under `../evidence/M2/`. When publishing, commit this Markdown file together with the entire `evidence/M2/` directory; the links will not render if the image files are missing from GitHub.
+
 ## 1. Executive Summary
 
 IR-Range3-M2, “Sleeping Endpoint,” continues the verified Scenario 1 handoff from IR-Range3-M1. The M2 exercise creates a controlled hibernation-evidence artifact, requires inspection of compressed-page allocation slack, and forwards the account, timestamp, transaction identifiers, and evidence hashes to IR-Range3-M3 for PostgreSQL WAL scoping.

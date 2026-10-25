@@ -8,6 +8,9 @@
 
 ---
 
+
+> **Screenshot evidence:** Images below are embedded from the repository-relative files under `../evidence/M1/`. When publishing, commit this Markdown file together with the entire `evidence/M1/` directory; the links will not render if the image files are missing from GitHub.
+
 ## 1. Executive summary
 
 The IR-Range3-M1 Trojan Research Utility scenario was prepared and validated in the existing Ubuntu VirtualBox environment. The setup validator passed, the local gateway responded on TCP 32761, the APK digest matched the supplied expected SHA-256, and the detached signature verified with OpenSSL. The bundled Nuclei template was validated and used only against 127.0.0.1. The live attack validator passed, incident telemetry was collected and hashed, and the M1-to-M2 handoff was generated and accepted by the completion validator.
@@ -225,68 +228,68 @@ The following 14 screenshots are the supplied terminal captures from the M1 work
 
 ![Terminal evidence E01](../evidence/M1/E01.jpg)
 
-**E01 | 24 Oct 2026, VM clock 13:05 | **Package extraction, setup-script syntax check, and initial VM/network preflight.
+**E01 | 24 Oct 2026, VM clock 13:05 |** Package extraction, setup-script syntax check, and initial VM/network preflight.
 
 ![Terminal evidence E02](../evidence/M1/E02.jpg)
 
-**E02 | 24 Oct 2026, VM clock 13:07 | **Manifest results and setup validation. One manifest checksum mismatch warning was reported; setup and clean-state validation passed.
+**E02 | 24 Oct 2026, VM clock 13:07 |** Manifest results and setup validation. One manifest checksum mismatch warning was reported; setup and clean-state validation passed.
 
 ### Appendix A. Terminal screenshot evidence (continued)
 
 ![Terminal evidence E03](../evidence/M1/E03.jpg)
 
-**E03 | 24 Oct 2026, VM clock 13:09 | **Local gateway health and status returned HTTP 200; attack assets passed verification; Nuclei was not yet installed.
+**E03 | 24 Oct 2026, VM clock 13:09 |** Local gateway health and status returned HTTP 200; attack assets passed verification; Nuclei was not yet installed.
 
 ![Terminal evidence E04](../evidence/M1/E04.jpg)
 
-**E04 | 24 Oct 2026, VM clock 13:11 | **Read-only review of the attack validator, scenario configuration, evidence inventory, and technical story.
+**E04 | 24 Oct 2026, VM clock 13:11 |** Read-only review of the attack validator, scenario configuration, evidence inventory, and technical story.
 
 ### Appendix A. Terminal screenshot evidence (continued)
 
 ![Terminal evidence E05](../evidence/M1/E05.jpg)
 
-**E05 | 24 Oct 2026, VM clock 13:14 | **Preserved APK SHA-256 matched the expected digest and OpenSSL detached-signature verification returned Verified OK.
+**E05 | 24 Oct 2026, VM clock 13:14 |** Preserved APK SHA-256 matched the expected digest and OpenSSL detached-signature verification returned Verified OK.
 
 ![Terminal evidence E06](../evidence/M1/E06.jpg)
 
-**E06 | 24 Oct 2026, VM clock 13:15 | **Review of the two TTP templates and validator logic; the active incident source was required to be nuclei.
+**E06 | 24 Oct 2026, VM clock 13:15 |** Review of the two TTP templates and validator logic; the active incident source was required to be nuclei.
 
 ### Appendix A. Terminal screenshot evidence (continued)
 
 ![Terminal evidence E07](../evidence/M1/E07.jpg)
 
-**E07 | 24 Oct 2026, VM clock 13:17 | **Template and documentation references identified the local release endpoint and the intended M2 handoff path.
+**E07 | 24 Oct 2026, VM clock 13:17 |** Template and documentation references identified the local release endpoint and the intended M2 handoff path.
 
 ![Terminal evidence E08](../evidence/M1/E08.jpg)
 
-**E08 | 24 Oct 2026, VM clock 13:21 | **Nuclei v3.11.1 template validation succeeded; the local scan produced one match and live-telemetry validation passed.
+**E08 | 24 Oct 2026, VM clock 13:21 |** Nuclei v3.11.1 template validation succeeded; the local scan produced one match and live-telemetry validation passed.
 
 ### Appendix A. Terminal screenshot evidence (continued)
 
 ![Terminal evidence E09](../evidence/M1/E09.jpg)
 
-**E09 | 24 Oct 2026, VM clock 13:23 | **Evidence inventory and SHA-256 manifest checks for the collected case files.
+**E09 | 24 Oct 2026, VM clock 13:23 |** Evidence inventory and SHA-256 manifest checks for the collected case files.
 
 ![Terminal evidence E10](../evidence/M1/E10.jpg)
 
-**E10 | 24 Oct 2026, VM clock 13:25 | **Incident status and process/network telemetry review. The attempted device-artifact copy used a path that did not resolve.
+**E10 | 24 Oct 2026, VM clock 13:25 |** Incident status and process/network telemetry review. The attempted device-artifact copy used a path that did not resolve.
 
 ### Appendix A. Terminal screenshot evidence (continued)
 
 ![Terminal evidence E11](../evidence/M1/E11.jpg)
 
-**E11 | 24 Oct 2026, VM clock 13:26 | **Evidence-manifest entries verified; completion validation initially reported M2 handoff missing.
+**E11 | 24 Oct 2026, VM clock 13:26 |** Evidence-manifest entries verified; completion validation initially reported M2 handoff missing.
 
 ![Terminal evidence E12](../evidence/M1/E12.jpg)
 
-**E12 | 24 Oct 2026, VM clock 13:27 | **Read-only review of completion requirements, M2 handoff builder, and documented handoff contract.
+**E12 | 24 Oct 2026, VM clock 13:27 |** Read-only review of completion requirements, M2 handoff builder, and documented handoff contract.
 
 ### Appendix A. Terminal screenshot evidence (continued)
 
 ![Terminal evidence E13](../evidence/M1/E13.jpg)
 
-**E13 | 24 Oct 2026, VM clock 13:29 | **Generated M1-to-M2 handoff JSON and inspected its machine IDs, case ID, researcher and workstation identifiers.
+**E13 | 24 Oct 2026, VM clock 13:29 |** Generated M1-to-M2 handoff JSON and inspected its machine IDs, case ID, researcher and workstation identifiers.
 
 ![Terminal evidence E14](../evidence/M1/E14.jpg)
 
-**E14 | 24 Oct 2026, VM clock 13:30 | **Final completion validator returned [PASS] Scenario 2 handoff validated.
+**E14 | 24 Oct 2026, VM clock 13:30 |** Final completion validator returned [PASS] Scenario 2 handoff validated.
